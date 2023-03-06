@@ -45,6 +45,16 @@ resource "aws_instance" "k3s-master-node" {
   security_groups = [aws_security_group.k3s-sg.name]
   #  subnet_id = "${aws_subnet.k3s-subnet.id}"
 
+  connection {
+    host = aws_instance.k3s-master-node.private_ip
+    user = "ec2-user"
+    private_key = var.key_pair
+  }
+
+  provisioner "local-exec" {
+    command = "printf '[k3sdemo]\n${aws_instance.k3s-master-node.private_ip}' > ./inventory/hosts"
+  }
+
   tags = {
     Name = "sye-k3s-master-node"
   }
@@ -136,5 +146,19 @@ resource "aws_security_group" "k3s-sg" {
 # ---------------------------------------------------------------------------------------------
 # Run Provisioner: pretasks and invoke ansible playbook for k3s and consul deployment
 # ---------------------------------------------------------------------------------------------
-
-
+#resource "aws_instance" "connection_ec2" {
+#  ami           = "${var.ami}"
+#  instance_type = "${var.instance_type}"
+#  key_name = "${aws_key_pair.deployer.key_name}"
+#  security_groups = ["${aws_security_group.k3s-sg.id}"]
+#
+#  connection {
+#    host = aws_instance.k3s-master-node.private_ip
+#    user = "ec2-user"
+#    private_key = var.key_pair
+#  }
+#
+#  provisioner "local-exec" {
+#    command = "printf '[k3sdemo]\n${aws_instance.k3s-master-node.private_ip}' > ./inventory/hosts"
+#  }
+#}

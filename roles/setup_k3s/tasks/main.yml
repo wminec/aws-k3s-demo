@@ -1,0 +1,62 @@
+---
+# -----------------------------------------------------------------------------------------------------
+# Install k3s from url source script - https://get.k3s.io
+# helm stable/nfs-server-provisioner used as default dynamic provisoner  
+#
+# - Author: Rajendra Adhikari
+# - Date: 05-05-2019
+# -----------------------------------------------------------------------------------------------------
+
+- name: Install k3s cluster from k3s.io script
+  shell: /usr/bin/curl -sfL https://get.k3s.io | K3S_TOKEN=SECRET sh -s - server --cluster-init
+  become: true
+
+    #- name: delay 60s
+    #  pause:
+    #    seconds: 60
+    #
+    ## -- Ran into a bug where the k3s.service sometimes is not started properly.
+    ## -- Added service restart until it starts successfully. 
+    #- name: restart the k3s instances unless successful ( unless successfull to address the bug )
+    #  service:
+    #    name: k3s.service
+    #    enabled: true
+    #    state: restarted
+    #  register: k3s_service_result
+    #  retries: 10
+    #  delay: 3
+    #  until: k3s_service_result is succeeded
+    #  become: true
+    #
+    #- name: wait for cluster availability
+    #  shell: /usr/local/bin/kubectl get nodes | awk '{print $2}' | tail -1
+    #  register: check_k3s
+    #  retries: 10
+    #  delay: 3
+    #  until: check_k3s.stdout == "Ready"
+    #
+    #- name: push the nfs-provisioner yaml config files
+    #  copy:
+    #    src: nfs-provisioner.yml
+    #    dest: .
+    #  become: true
+    #
+    #
+    ## -- File: ../files/nfs-provisioner.yml
+    ## -- Uses helm nfs-server-provisioner as a default storage-class
+    ## -- Note: Pods is running withiut any local volume mount emptyDir
+    ## --       So the  data is not persistent 
+    #- name: create nfs-provisioner namespace
+    #  shell: /usr/local/bin/kubectl create ns nfs-provisioner
+    #  ignore_errors: true
+    #
+    #- name: apply the nfs-provisioer.yml config
+    #  shell: /usr/local/bin/kubectl -n kube-system create -f nfs-provisioner.yml
+    #  ignore_errors: true
+    #
+    #- name: check for nfs storage class availability
+    #  shell: /usr/local/bin/kubectl get sc nfs | awk '{print $1}' | grep nfs 
+    #  register: check_nfs
+    #  retries: 10
+    #  delay: 15
+    #  until: check_nfs.stdout == "nfs"
