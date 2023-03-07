@@ -47,8 +47,8 @@ resource "aws_instance" "k3s-master-node" {
   #  subnet_id = "${aws_subnet.k3s-subnet.id}"
 
   connection {
-    #host = aws_instance.k3s-master-node.private_ip
-    host = aws_instance.k3s-master-node.public_ip
+    host = aws_instance.k3s-master-node.private_ip
+    #host = aws_instance.k3s-master-node.public_ip
     user = "ec2-user"
 #    private_key = var.key_pair
     private_key = "${file("/home/ec2-user/.ssh/id_rsa")}"
@@ -56,14 +56,19 @@ resource "aws_instance" "k3s-master-node" {
   }
 
   provisioner "local-exec" {
-    command = "printf '[k3sdemo]\n${aws_instance.k3s-master-node.private_ip}' > ./inventory/hosts"
+    command = "cp -R ./inventory/sample inventory/my-cluster && printf '[master]\n${aws_instance.k3s-master-node.private_ip}\n\n[k3s_cluster:children]\nmaster' > ./inventory/my-cluster/hosts.ini && sed -i 's/ansible_user: debian/ansible_user: ec2-user/g' ./inventory/my-cluster/group_vars/all.yml"
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo dnf update -y",
-      "sudo yum install python -y",
+      "sudo dnf install python -y",
+      "sudo dnf clean all",
     ]
+  }
+
+  provisioner "local-exec" {
+    command = "ansible-playbook -i ./inventory/my-cluster/hosts.ini site.yml"
   }
 
   tags = {
