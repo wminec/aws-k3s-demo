@@ -30,10 +30,10 @@ provider "aws" {
 #  secret_key = var.secret_key
 }
 
-#resource "aws_key_pair" "deployer" {
-#  key_name   = "sye-key"
-#  public_key = var.ssh_rsa_pub
-#}
+resource "aws_key_pair" "deployer" {
+  key_name   = "k3s-setup-key"
+  public_key = var.ssh_rsa_pub
+}
 
 # ---------------------------------------------------------------------------------------------
 # Deploy an EC2 instance
@@ -41,18 +41,29 @@ provider "aws" {
 resource "aws_instance" "k3s-master-node" {
   ami             = var.ami
   instance_type   = var.instance_type
-  key_name        = var.key_pair
+#  key_name        = var.key_pair
+  key_name        = aws_key_pair.deployer.key_name
   security_groups = [aws_security_group.k3s-sg.name]
   #  subnet_id = "${aws_subnet.k3s-subnet.id}"
 
   connection {
-    host = aws_instance.k3s-master-node.private_ip
+    #host = aws_instance.k3s-master-node.private_ip
+    host = aws_instance.k3s-master-node.public_ip
     user = "ec2-user"
-    private_key = var.key_pair
+#    private_key = var.key_pair
+    private_key = "${file("/home/ec2-user/.ssh/id_rsa")}"
+#    agent = true
   }
 
   provisioner "local-exec" {
     command = "printf '[k3sdemo]\n${aws_instance.k3s-master-node.private_ip}' > ./inventory/hosts"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo dnf update -y",
+      "sudo yum install python -y",
+    ]
   }
 
   tags = {
