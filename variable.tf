@@ -30,7 +30,7 @@ variable "instance_type" {
 
 variable "ssh_rsa_pub" {
   description = "ssh public key for access to EC2 instance"
-  default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCsYsEJQ+dJPIIOY0KY4bfYisHsj1EfN2NCMzcG5QLcPjCZdGBQj5jRmCxrs0EzE/fuJsLUPVfI7C2rHusJiFI4OhME+QBL+R+Q9jFvE5YTjeu45nmR3p50j0QmSonPu/4y1G5dG6GijAM5hJAb0OSf1p8QZ6laH24IJEbNL5o0NVXHk26B1bwgfSy+ins7cWQhL8h2vviYCKi3FufpU8867QdWoz+An2e5hpXvx51J88/n13X8W4abKR5XfrNTR/ne1RrYfGkQs2BUbNtXay4QYvrYjbT0eZRIQNSVXk486Bf+dSD7yIIjblBfPuoa9deQjWBwv3mulzx5ezDbES/GvShBbod7YKAgoNY7gV9qdrXY+ry77ZFZ3SAq7JFfgHeULUjBmHkcIeAXXmfwhI8ZOnLV1LZhsiXOEe4c6DxkaNfWX/dWOQejKReutgYgpGxnaKAwDGadnMnMcfvzP0eItaG4P5Um9ISXXFS4FZPJHG+B9DW9NMWg+eFXdgqi3r0= ec2-user@ip-172-31-5-60.ec2.internal"
+  default     = ""
 }
 
 variable "vpc_id" {
