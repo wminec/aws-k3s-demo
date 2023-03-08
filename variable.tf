@@ -30,7 +30,7 @@ variable "instance_type" {
 
 variable "ssh_rsa_pub" {
   description = "ssh public key for access to EC2 instance"
-  default     = ""
+  default     = "YOUR_SSH_PUBLIC_KEY"
 }
 
 variable "vpc_id" {
